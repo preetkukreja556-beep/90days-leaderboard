@@ -8,14 +8,14 @@
         "type": "function",
         "name": "fetcher",
         "properties": {
-          "stack": "node20",
+          "stack": "node22",
           "code": {
             "path": "functions/fetcher.zip"
           },
           "configuration": {
             "environment": {
               "variables": {
-                "MAX_FORKS": "15"
+                "MAX_FORKS": "50"
               }
             },
             "memory": 256

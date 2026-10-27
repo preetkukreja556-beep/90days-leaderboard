@@ -1,7 +1,7 @@
 {
 	"deployment": {
 		"name": "fetcher",
-		"stack": "node20",
+		"stack": "node22",
 		"type": "job",
 		"env_variables": {}
 	},

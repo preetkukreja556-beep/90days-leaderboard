@@ -30,7 +30,7 @@ Fork this repo, create a project on [Catalyst by Zoho](https://catalyst.zoho.com
 | Need | Check |
 | --- | --- |
 | A Catalyst account | Students get it free at [catalyst.zoho.com/students](https://catalyst.zoho.com/students). Sign up through that page. |
-| Node 20 | `node -v` |
+| Node 22 | `node -v` |
 | Docker | `docker version` (the API ships as a container) |
 | Git and the GitHub CLI | `gh auth status` (the CLI is optional but the commands below use it) |
 | The Catalyst CLI | `npm i -g zcatalyst-cli` then `catalyst -v` |
@@ -230,7 +230,7 @@ In the console, open the function `fetcher`, then its configuration, and add env
 
 | Variable | Value | Why |
 | --- | --- | --- |
-| `MAX_FORKS` | `15` to start | Caps work per run. Raise it once you add a token. |
+| `MAX_FORKS` | `50` | Caps work per run. |
 | `GITHUB_TOKEN` | a GitHub token | Without it GitHub allows 60 requests an hour. |
 | `UPSTREAM_REPO` | `owner/repo` (optional) | Defaults to `TrainWithShubham/90DaysOfDevOps`. |
 | `COHORT_START` | `YYYY-MM-DD` (optional) | Commits before this date are ignored. Default `2026-01-23`. |
@@ -311,9 +311,9 @@ If `/api/health/schema` returns `503`, the response lists the missing columns. A
 Now load the first rows by running the fetcher once from your machine. This writes to your **Development** data:
 
 ```bash
-# The CLI needs a Node 20 binary to run functions locally
-catalyst config:set node20.bin=$(npx -y node@20 -p "process.execPath")
-MAX_FORKS=15 catalyst functions:execute fetcher --key test_job -ni
+# The CLI needs a Node 22 binary to run functions locally
+catalyst config:set node22.bin=$(npx -y node@22 -p "process.execPath")
+MAX_FORKS=50 catalyst functions:execute fetcher --key test_job -ni
 ```
 
 Then reload `WEB_URL`. You should see learners.

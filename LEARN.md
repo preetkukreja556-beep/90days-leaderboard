@@ -118,7 +118,7 @@ For anything longer than 15 minutes, use AppSail, which has no timeout.
 
 **In this repo:** the `fetcher` is a **Job** function, because syncing hundreds of forks takes far longer than 30 seconds. See [`functions/fetcher/index.js`](functions/fetcher/index.js). It ends with `context.closeWithSuccess()` or `closeWithFailure()`, which is how Catalyst knows the job is done.
 
-**Run one locally:** `catalyst functions:execute fetcher --key test_job -ni`, where the input comes from `catalyst-inputs.json`. The CLI needs a Node binary matching the function's stack (Node 20 here).
+**Run one locally:** `catalyst functions:execute fetcher --key test_job -ni`, where the input comes from `catalyst-inputs.json`. The CLI needs a Node binary matching the function's stack (Node 22 here).
 
 ### AppSail
 
@@ -240,7 +240,7 @@ These are real, in the order we met them.
 | 3 | Queries failed with "Unknown Table or Column". The table existed but had only system columns. | Columns are created in the console and are easy to miss. We added [`schema.json`](backend/schema.json) and a `/api/health/schema` check so it fails loudly. |
 | 4 | A new deploy answered `AppSail is disabled`, then `Execution failed`. | A fresh container takes about a minute to start. Poll health instead of guessing. |
 | 5 | A deploy crashed at startup. The Dockerfile hadn't copied a new JSON file. | Run the image locally before deploying. A smoke test catches this. |
-| 6 | `catalyst functions:execute` wanted Node 20, but the laptop had Node 25. | The CLI needs a runtime matching the function's stack. |
+| 6 | `catalyst functions:execute` wanted Node 22, but the laptop had Node 25. | The CLI needs a runtime matching the function's stack. |
 | 7 | `catalyst.json` recorded an absolute path from one laptop. | Machine-specific paths break forks and CI, so [`scripts/relink-slate.js`](scripts/relink-slate.js) fixes it. |
 | 8 | A function's logs couldn't be read from the CLI. | Debug by adding a temporary diagnostic route, and remove it afterwards. |
 

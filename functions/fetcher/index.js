@@ -12,7 +12,7 @@ const config = () => ({
   upstream: process.env.UPSTREAM_REPO || 'TrainWithShubham/90DaysOfDevOps',
   start: process.env.COHORT_START || '2026-01-23',
   token: process.env.GITHUB_TOKEN,
-  maxForks: Number(process.env.MAX_FORKS || 300),
+  maxForks: Number(process.env.MAX_FORKS || 50),
 });
 
 async function existingRows(datastore) {

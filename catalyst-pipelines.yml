@@ -14,7 +14,7 @@
 #
 # No `images:` block on purpose: every image entry must carry registry credentials, and without one the jobs run
 # on Catalyst's default Ubuntu image. That image has Node 18 and no `catalyst` on the job's PATH, so
-# scripts/with-node20.sh fetches Node 20 from npm and scripts/with-catalyst.sh installs a pinned CLI (1.28.0).
+# scripts/with-node22.sh fetches Node 22 from npm and scripts/with-catalyst.sh installs a pinned CLI (1.28.0).
 #
 # Why GITHUB_TOKEN and MAX_FORKS live here: a deploy replaces the function's variables with the ones in
 # catalyst-config.json. scripts/inject-fetcher-env.js fills that file in on the runner so they survive.
@@ -31,34 +31,34 @@ jobs:
         DEV_API_URL="<< env.DEV_API_URL >>" GITHUB_TOKEN="<< env.GITHUB_TOKEN >>"
         MAX_FORKS="<< env.MAX_FORKS >>" sh scripts/check-pipeline-vars.sh
 
-  # Tests and the dependency audit gate every deploy. The audit looks at what ships, not at dev tooling.
+  # Tests and a full dependency audit, including build and test tooling, gate every deploy.
   test-backend:
     steps:
-      - sh scripts/with-node20.sh sh -c "cd backend && npm ci && npm test && npm audit --omit=dev --audit-level=high"
+      - sh scripts/with-node22.sh sh -c "cd backend && npm ci && npm test && npm audit --audit-level=high"
 
   test-frontend:
     steps:
-      - sh scripts/with-node20.sh sh -c "cd frontend && npm ci && npm test && npm run build && npm audit --omit=dev --audit-level=high"
+      - sh scripts/with-node22.sh sh -c "cd frontend && npm ci && npm test && npm run build && npm audit --audit-level=high"
 
   test-fetcher:
     steps:
-      - sh scripts/with-node20.sh sh -c "cd functions/fetcher && npm ci && npm test && npm audit --omit=dev --audit-level=high"
+      - sh scripts/with-node22.sh sh -c "cd functions/fetcher && npm ci && npm test && npm audit --audit-level=high"
 
   deploy-fetcher:
     steps:
       - GITHUB_TOKEN="<< env.GITHUB_TOKEN >>" MAX_FORKS="<< env.MAX_FORKS >>" node scripts/inject-fetcher-env.js
       - >-
-        sh scripts/with-node20.sh sh scripts/with-catalyst.sh catalyst deploy --only functions:fetcher
+        sh scripts/with-node22.sh sh scripts/with-catalyst.sh catalyst deploy --only functions:fetcher
         --project << env.PROJECT_ID >> --org << env.CATALYST_ORG >> --dc << env.CATALYST_DC >>
         --token << env.CATALYST_TOKEN >> -ni
 
   # --build-path ships the folder as it is, so install the runtime dependencies first.
   deploy-api:
     steps:
-      - sh scripts/with-node20.sh sh -c "cd backend && npm ci --omit=dev"
+      - sh scripts/with-node22.sh sh -c "cd backend && npm ci --omit=dev"
       - >-
-        sh scripts/with-node20.sh sh scripts/with-catalyst.sh catalyst deploy appsail --name leaderboard-api --build-path backend
-        --stack node20 --command "node src/server.js"
+        sh scripts/with-node22.sh sh scripts/with-catalyst.sh catalyst deploy appsail --name leaderboard-api --build-path backend
+        --stack node22 --command "node src/server.js"
         --project << env.PROJECT_ID >> --org << env.CATALYST_ORG >> --dc << env.CATALYST_DC >>
         --token << env.CATALYST_TOKEN >> -ni
 
@@ -68,7 +68,7 @@ jobs:
       - echo "VITE_API_BASE=<< env.DEV_API_URL >>" > frontend/.env.production
       - node scripts/relink-slate.js
       - >-
-        sh scripts/with-node20.sh sh scripts/with-catalyst.sh catalyst deploy slate leaderboard-web -m "pipeline build"
+        sh scripts/with-node22.sh sh scripts/with-catalyst.sh catalyst deploy slate leaderboard-web -m "pipeline build"
         --project << env.PROJECT_ID >> --org << env.CATALYST_ORG >> --dc << env.CATALYST_DC >>
         --token << env.CATALYST_TOKEN >> -ni
 

@@ -20,7 +20,7 @@
 | Fetcher | `GITHUB_TOKEN` | none | Avoids the 60 requests/hour anonymous limit |
 | Fetcher | `UPSTREAM_REPO` | `TrainWithShubham/90DaysOfDevOps` | Repo whose forks are scanned |
 | Fetcher | `COHORT_START` | `2026-01-23` | Commits before this date are ignored |
-| Fetcher | `MAX_FORKS` | `300` | Forks processed per run |
+| Fetcher | `MAX_FORKS` | `50` | Forks processed per run |
 | Frontend | `VITE_API_BASE` | same origin | API URL, set at build time |
 
 ## Project structure

@@ -85,13 +85,13 @@ The schedule is a **job pool** (where jobs run) plus a **cron** (when). Both are
 >
 > **Trap: IDs differ per environment.** When Production got its own copy of the pool, it also got a new ID. A manual run that used the Development pool's ID reported `FAILURE`; use the pool ID of the environment you are in.
 >
-> **Trap: the rate limit.** Without a `GITHUB_TOKEN`, GitHub allows 60 requests an hour, so keep `MAX_FORKS` low (we used 15) or add a token.
+> **Trap: the rate limit.** Without a `GITHUB_TOKEN`, GitHub allows 60 requests an hour. Development uses a token and `MAX_FORKS=50`.
 
 Load the first data by hand to check it works:
 
 ```bash
-catalyst config:set node20.bin=$(npx -y node@20 -p "process.execPath")   # the local run needs a Node 20 binary
-MAX_FORKS=15 catalyst functions:execute fetcher --key test_job -ni
+catalyst config:set node22.bin=$(npx -y node@22 -p "process.execPath")   # the local run needs a Node 22 binary
+MAX_FORKS=50 catalyst functions:execute fetcher --key test_job -ni
 ```
 
 ### 7. CI/CD: test, deploy, smoke, approve
@@ -122,7 +122,7 @@ It also checks `/api/health/schema` and `/api/leaderboard`, retrying while the c
 
 > **Trap: your token is a secret.** `catalyst token:generate` prints a full-access token. Run it in your own terminal, put it straight into the secret, and never paste it into a chat or a log. Revoke old ones with `catalyst token:revoke <id>`.
 >
-> **GitHub Actions or Catalyst Pipelines?** Both run the same flow. GitHub Actions deploys on every push to `main`. [`catalyst-pipelines.yml`](../catalyst-pipelines.yml) runs on Catalyst Pipelines, which needs its own variables (see the comment at the top of the file); the default image there has Node 18 and no `catalyst` command, so the file installs Node 20 and a pinned CLI itself.
+> **GitHub Actions or Catalyst Pipelines?** Both run the same flow. GitHub Actions deploys on every push to `main`. [`catalyst-pipelines.yml`](../catalyst-pipelines.yml) runs on Catalyst Pipelines, which needs its own variables (see the comment at the top of the file); the default image there has Node 18 and no `catalyst` command, so the file installs Node 22 and a pinned CLI itself.
 
 ### 8. Promote to Production, with a human in the loop
 
@@ -205,7 +205,7 @@ Two limits we hit are worth knowing before you hand an agent your account:
 | The container exits with `Cannot find module` | A file is missing from the image. Run it locally with `docker run` first. |
 | Slate shows "Can't reach the leaderboard API" | `VITE_API_BASE` was empty or wrong at build time. Rebuild and redeploy. |
 | The production site loads but is empty | Production has its own data. Run the sync there. |
-| `catalyst functions:execute` says Node v20 is missing | Run `catalyst config:set node20.bin=<path to a Node 20 binary>`. |
+| `catalyst functions:execute` says Node v22 is missing | Run `catalyst config:set node22.bin=<path to a Node 22 binary>`. |
 | A CLI call with a token fails or hits the wrong region | Add `--dc in` (or your data center). |
 | MCP login ends on "This site can't be reached" | Paste the address-bar URL to the agent in the same session. |
 | A job pool name is rejected | Use only letters, numbers and underscores. |

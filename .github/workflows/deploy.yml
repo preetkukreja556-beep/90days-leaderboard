@@ -37,11 +37,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: ${{ matrix.dir }}/package-lock.json
       - run: npm ci
       - run: npm test
+      - run: npm audit --audit-level=high
       - if: matrix.dir == 'frontend'
         run: npm run build
 
@@ -55,8 +56,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: npm i -g zcatalyst-cli
+      - name: Configure fetcher runtime variables
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAX_FORKS: ${{ vars.MAX_FORKS || '50' }}
+        run: node scripts/inject-fetcher-env.js
       - name: Fetcher
         run: catalyst deploy --only functions:fetcher $CATALYST_FLAGS
       # The deploy prints the service URL. Read it here so a fresh fork needs no DEV_API_URL up front;
@@ -95,8 +101,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: npm i -g zcatalyst-cli
+      - name: Configure fetcher runtime variables
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAX_FORKS: ${{ vars.MAX_FORKS || '50' }}
+        run: node scripts/inject-fetcher-env.js
       - run: catalyst deploy --production $CATALYST_FLAGS
       - run: |
           echo "VITE_API_BASE=${{ vars.PROD_API_URL }}" > frontend/.env.production

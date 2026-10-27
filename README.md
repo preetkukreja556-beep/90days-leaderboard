@@ -4,10 +4,10 @@
 
 **Who is consistent, and who is on a streak? A three-tier app on [Catalyst by Zoho](https://catalyst.zoho.com), built by an AI agent and shipped by a human.**
 
-[**Live site**](https://90daysofdevops-leaderboard.onslate.in) · [**Deploy your own**](DEPLOY.md) · [**Learn Catalyst**](LEARN.md) · [**Take the challenge**](#take-the-challenge)
+[**Development preview**](https://90daysofdevops-leaderboards.onslate.in) · [**Deploy your own**](DEPLOY.md) · [**Learn Catalyst**](LEARN.md) · [**Take the challenge**](#take-the-challenge)
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-c6ff3d?style=flat-square)
-![Node 20](https://img.shields.io/badge/node-20-339933?style=flat-square&logo=node.js&logoColor=white)
+![Node 22](https://img.shields.io/badge/node-22-339933?style=flat-square&logo=node.js&logoColor=white)
 ![Catalyst](https://img.shields.io/badge/catalyst-AppSail%20%C2%B7%20Slate%20%C2%B7%20Data%20Store-ff6a00?style=flat-square)
 
 <img src="docs/screenshots/leaderboard-production.png" alt="The live leaderboard: podium for the top three, a stats strip, and a standings table with 90-day progress strips" width="760">

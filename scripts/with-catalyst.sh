@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 # Run a command with the Catalyst CLI on PATH. Catalyst's default pipeline image does not have `catalyst`
 # available to job scripts, so install a pinned version from npm into a local folder (no root needed).
-# Run it under scripts/with-node20.sh so the CLI uses Node 20.
-# Usage: sh scripts/with-node20.sh sh scripts/with-catalyst.sh <command> [args...]
+# Run it under scripts/with-node22.sh so the CLI uses Node 22.
+# Usage: sh scripts/with-node22.sh sh scripts/with-catalyst.sh <command> [args...]
 set -eu
 
 version="${CATALYST_CLI_VERSION:-1.28.0}"
