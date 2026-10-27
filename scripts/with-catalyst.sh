@@ -1,11 +1,10 @@
 #!/usr/bin/env sh
-# Run a command with the Catalyst CLI on PATH. Catalyst's default pipeline image does not have `catalyst`
-# available to job scripts, so install a pinned version from npm into a local folder (no root needed).
+# Run a command with a pinned Catalyst CLI on PATH so pipeline deploys use a repeatable version.
 # Run it under scripts/with-node22.sh so the CLI uses Node 22.
 # Usage: sh scripts/with-node22.sh sh scripts/with-catalyst.sh <command> [args...]
 set -eu
 
-version="${CATALYST_CLI_VERSION:-1.28.0}"
+version="${CATALYST_CLI_VERSION:-1.29.0}"
 dir="${CATALYST_CLI_DIR:-${TMPDIR:-/tmp}/catalyst-cli}"
 if [ ! -x "$dir/node_modules/.bin/catalyst" ]; then
   npm install --prefix "$dir" --no-audit --no-fund --loglevel=error "zcatalyst-cli@$version"

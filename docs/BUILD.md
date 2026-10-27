@@ -122,7 +122,7 @@ It also checks `/api/health/schema` and `/api/leaderboard`, retrying while the c
 
 > **Trap: your token is a secret.** `catalyst token:generate` prints a full-access token. Run it in your own terminal, put it straight into the secret, and never paste it into a chat or a log. Revoke old ones with `catalyst token:revoke <id>`.
 >
-> **GitHub Actions or Catalyst Pipelines?** Both run the same flow. GitHub Actions deploys on every push to `main`. [`catalyst-pipelines.yml`](../catalyst-pipelines.yml) runs on Catalyst Pipelines, which needs its own variables (see the comment at the top of the file); the default image there has Node 18 and no `catalyst` command, so the file installs Node 22 and a pinned CLI itself.
+> **GitHub Actions or Catalyst Pipelines?** Both run the same flow. GitHub Actions deploys on every push to `main`. [`catalyst-pipelines.yml`](../catalyst-pipelines.yml) runs on Catalyst Pipelines and needs its own variables (see the comment at the top of the file). Its default runner uses Node 18, so the pipeline installs Node 22 and pins the Catalyst CLI for repeatable builds.
 
 ### 8. Promote to Production, with a human in the loop
 

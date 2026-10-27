@@ -12,9 +12,8 @@
 # No `pipeline-when` on purpose: the pipeline is already bound to branch main, and a manual run reports
 # event.ref as `main` rather than `refs/heads/main`, so that condition made every manual run fail.
 #
-# No `images:` block on purpose: every image entry must carry registry credentials, and without one the jobs run
-# on Catalyst's default Ubuntu image. That image has Node 18 and no `catalyst` on the job's PATH, so
-# scripts/with-node22.sh fetches Node 22 from npm and scripts/with-catalyst.sh installs a pinned CLI (1.28.0).
+# No `images:` block: use Catalyst's default Ubuntu runner and keep the toolchain consistent by installing
+# Node 22 and a pinned Catalyst CLI. The AppSail job also needs a Docker daemon to build the API image.
 #
 # Why GITHUB_TOKEN and MAX_FORKS live here: a deploy replaces the function's variables with the ones in
 # catalyst-config.json. scripts/inject-fetcher-env.js fills that file in on the runner so they survive.
@@ -52,13 +51,14 @@ jobs:
         --project << env.PROJECT_ID >> --org << env.CATALYST_ORG >> --dc << env.CATALYST_DC >>
         --token << env.CATALYST_TOKEN >> -ni
 
-  # --build-path ships the folder as it is, so install the runtime dependencies first.
+  # AppSail runs this API as a custom Docker runtime, matching backend/Dockerfile and the deployed service.
   deploy-api:
     steps:
-      - sh scripts/with-node22.sh sh -c "cd backend && npm ci --omit=dev"
+      - docker version
+      - docker build --platform linux/amd64 -t leaderboard-api:pipeline backend
       - >-
-        sh scripts/with-node22.sh sh scripts/with-catalyst.sh catalyst deploy appsail --name leaderboard-api --build-path backend
-        --stack node22 --command "node src/server.js"
+        sh scripts/with-node22.sh sh scripts/with-catalyst.sh catalyst deploy appsail --name leaderboard-api
+        --source docker://leaderboard-api:pipeline --port 9000
         --project << env.PROJECT_ID >> --org << env.CATALYST_ORG >> --dc << env.CATALYST_DC >>
         --token << env.CATALYST_TOKEN >> -ni
 
