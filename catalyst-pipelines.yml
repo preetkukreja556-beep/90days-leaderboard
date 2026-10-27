@@ -1,0 +1,71 @@
+version: 1.0
+
+jobs:
+  preflight:
+    steps:
+      - >-
+        CATALYST_TOKEN="<< env.CATALYST_TOKEN >>" CATALYST_ORG="60093283351"
+        CATALYST_DC="in" PROJECT_ID="100861000000013053"
+        DEV_API_URL="https://leaderboard-api-50047159087.development.catalystappsail.in"
+        GITHUB_TOKEN="<< env.GITHUB_TOKEN >>" MAX_FORKS="50"
+        sh scripts/with-node22.sh sh scripts/with-catalyst.sh sh scripts/check-pipeline-vars.sh
+
+  test-backend:
+    steps:
+      - sh scripts/with-node22.sh sh -c "cd backend && npm ci && npm test && npm audit --audit-level=high"
+
+  test-frontend:
+    steps:
+      - sh scripts/with-node22.sh sh -c "cd frontend && npm ci && npm test && npm run build && npm audit --audit-level=high"
+
+  test-fetcher:
+    steps:
+      - sh scripts/with-node22.sh sh -c "cd functions/fetcher && npm ci && npm test && npm audit --audit-level=high"
+
+  deploy-fetcher:
+    steps:
+      - GITHUB_TOKEN="<< env.GITHUB_TOKEN >>" MAX_FORKS="50" node scripts/inject-fetcher-env.js
+      - >-
+        sh scripts/with-node22.sh sh scripts/with-catalyst.sh catalyst deploy --only functions:fetcher
+        --project 100861000000013053 --org 60093283351 --dc in
+        --token << env.CATALYST_TOKEN >> -ni
+
+  deploy-api:
+    steps:
+      - sh scripts/with-node22.sh sh -c "cd backend && npm ci --omit=dev"
+      - >-
+        sh scripts/with-node22.sh sh scripts/with-catalyst.sh catalyst deploy appsail --name leaderboard-api
+        --build-path "$PWD/backend" --stack node22 --command "node src/server.js"
+        --project 100861000000013053 --org 60093283351 --dc in
+        --token << env.CATALYST_TOKEN >> -ni
+
+  deploy-web:
+    steps:
+      - echo "VITE_API_BASE=https://leaderboard-api-50047159087.development.catalystappsail.in" > frontend/.env.production
+      - node scripts/relink-slate.js
+      - >-
+        sh scripts/with-node22.sh sh scripts/with-catalyst.sh catalyst deploy slate leaderboard-web -m "pipeline build"
+        --project 100861000000013053 --org 60093283351 --dc in
+        --token << env.CATALYST_TOKEN >> -ni
+
+  smoke-dev:
+    steps:
+      - sh scripts/smoke.sh "https://leaderboard-api-50047159087.development.catalystappsail.in"
+
+stages:
+  - name: preflight
+    jobs:
+      - preflight
+  - name: test
+    jobs:
+      - - test-backend
+        - test-fetcher
+      - test-frontend
+  - name: deploy-dev
+    jobs:
+      - - deploy-fetcher
+        - deploy-api
+      - deploy-web
+  - name: verify
+    jobs:
+      - smoke-dev
