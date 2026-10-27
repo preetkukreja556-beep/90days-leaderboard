@@ -8,8 +8,7 @@
 # No `pipeline-when` on purpose: the pipeline is already bound to branch main, and a manual run reports
 # event.ref as `main` rather than `refs/heads/main`, so that condition made every manual run fail.
 #
-# No `images:` block: use Catalyst's default Ubuntu runner and keep the toolchain consistent by installing
-# Node 22 and a pinned Catalyst CLI. The AppSail job also needs a Docker daemon to build the API image.
+# No `images:` block: use Catalyst's default Ubuntu runner and install Node 22 and a pinned Catalyst CLI.
 #
 # A deploy replaces the function's variables with catalyst-config.json. The fetcher job fills that file
 # on the runner from the global GITHUB_TOKEN and its configured fork limit.
@@ -47,14 +46,13 @@ jobs:
         --project 100861000000013053 --org 60093283351 --dc in
         --token << env.CATALYST_TOKEN >> -ni
 
-  # AppSail runs this API as a custom Docker runtime, matching backend/Dockerfile and the deployed service.
+  # Deploy the API as a managed Node 22 AppSail runtime; Catalyst runners do not include Docker.
   deploy-api:
     steps:
-      - docker version
-      - docker build --platform linux/amd64 -t leaderboard-api:pipeline backend
+      - sh scripts/with-node22.sh sh -c "cd backend && npm ci --omit=dev"
       - >-
         sh scripts/with-node22.sh sh scripts/with-catalyst.sh catalyst deploy appsail --name leaderboard-api
-        --source docker://leaderboard-api:pipeline --port 9000
+        --build-path "$PWD/backend" --stack node22 --command "node src/server.js"
         --project 100861000000013053 --org 60093283351 --dc in
         --token << env.CATALYST_TOKEN >> -ni
 
